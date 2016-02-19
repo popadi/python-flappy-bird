@@ -10,7 +10,7 @@ This is a Flappy Bird clone, one of my first python projects. It was made using 
 4. Run `python Flappy\ Bird.py` from the repo's directory
 5. Use <kbd>Space</kbd> or left-mouse-button to jump or <kbd>Esc</kbd> to exit.
 
-![image-1](http://imgur.com/lGSZJQ4)
-![image-2](http://imgur.com/lGSZJQ4)
-![image-3](http://imgur.com/ak8mbrV)
-![image-4](http://imgur.com/ak8mbrV)
+![image-1](http://imgur.com/lGSZJQ4.png)
+![image-2](http://imgur.com/lGSZJQ4.png)
+![image-3](http://imgur.com/ak8mbrV.png)
+![image-4](http://imgur.com/ak8mbrV.png)
