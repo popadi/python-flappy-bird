@@ -9,3 +9,6 @@ This is a Flappy Bird clone, one of my first python projects. It was made using 
 3. Clone this repository: `git clone https://github.com/PopAdi/python-flappy-bird.git` or click `Download ZIP` in the right panel and extract it.
 4. Run `python Flappy\ Bird.py` from the repo's directory
 5. Use <kbd>Space</kbd> or left-mouse-button to jump or <kbd>Esc</kbd> to exit.
+
+###Screenshots
+![image-1](http://i.imgur.com/ACMX2hB.png?1)
