@@ -35,7 +35,7 @@ def load_images():
 def draw_text(screen, text, y_pos, size):
     #Drawing a black text (bigger) and then a white text, smaller
     #over it to get the desired score effect
-    font = pygame.font.Font("04b_19.TTF", size)
+    font = pygame.font.Font("data/04b_19.TTF", size)
     score_text_b = font.render(str(text), 1, (0, 0, 0))
     score_text_w = font.render(str(text), 1, (255, 255, 255))
 
@@ -50,7 +50,7 @@ def end_the_game(screen, score):
     pygame.draw.rect(screen, (239, 228, 150), (25, HEIGHT / 2 - 75, 250, 150))
     draw_text(screen, "Your score: " + str(score), 200, 35)
     
-    f = open("highscore", "r+")
+    f = open("data/highscore", "r+")
     hs = int(f.readline())
     if(score > hs):
        hs = score
