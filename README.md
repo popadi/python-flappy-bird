@@ -14,3 +14,6 @@ This is a Flappy Bird clone, one of my first python projects. It was made using 
 ![image-2](http://i.imgur.com/O6xQS0C.png?1)
 ![image-3](http://i.imgur.com/2F0VXBQ.png?1)
 ![image-4](http://i.imgur.com/KZtHqAr.png?1)
+
+###Contribution
+If you have any ideas to make the game better, feel free to contribute!
