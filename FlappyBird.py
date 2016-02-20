@@ -3,51 +3,39 @@
 #Importing libraries
 import os, sys, pygame, random, math
 from pygame.locals import *
-from gameVariables import *
-from gameClasses import *
 from gameFunctions import *
-   
+from gameClasses import *
+import gameVariables
+
 def main():
-    #- Opening the game window in the center of the screen, setting the caption,
-    #and setting the icon
-    #- This is also the main function of the game which uses the other functions
-    #and classes to run properly
-
     #Initializing pygame & mixer
-    pygame.init()
-    pygame.mixer.init()
-
-    os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((SCR_RES.current_w - WIDTH) / 2, (SCR_RES.current_h - HEIGHT) / 2)
-    screen = pygame.display.set_mode([WIDTH, HEIGHT], pygame.DOUBLEBUF, 32)
-    pygame.display.set_caption("Flappy Bird")
-    pygame.display.set_icon(pygame.image.load('images/icon.ico'))
+    screen = initialize_pygame()
 
     #Setting up some timers 
     clock = pygame.time.Clock()
-    pygame.time.set_timer(EVENT_NEWPIPE, PIPE_ADD_INTERVAL)
+    pygame.time.set_timer(getNewPipe, pipesAddInterval)
     
-    #Loading the images | Creating the bird | Creating the ground | Creating the pipes list | Initiating the score
-    images = load_images()
-    my_bird = Bird()
-    my_ground = Ground(images['ground'])
-    pipes = []
-    score = 0
-    wait = True
-    
+    #Loading the images | Creating the bird | Creating the ground | Creating the game list
+    gamePipes = []
+    gameBird = Bird()
+    gameImages = load_images()
+    gameVariables.gameScore = 0
+    gameGround = Ground(gameImages['ground'])
+      
     #Loading the sounds
     jump_sound = pygame.mixer.Sound('sounds/jump.ogg')
     score_sound = pygame.mixer.Sound('sounds/score.ogg')
     dead_sound = pygame.mixer.Sound('sounds/dead.ogg')
 
-    while(wait == True):
-        #Draw everything and wait for the user to click to start the game
+    while(gameVariables.waitClick == True):
+        #Draw everything and waitClick for the user to click to start the game
         #When we click somewhere, the bird will jump and the game will start
-        screen.blit(images['background'], (0, 0))
+        screen.blit(gameImages['background'], (0, 0))
         draw_text(screen, "Click to start", 285, 20)
-        screen.blit(images['ground'], (0, HEIGHT - GROUND_HEIGHT))
+        screen.blit(gameImages['ground'], (0, gameHeight - groundHeight))
 
         #Drawing a "floating" flappy bird
-        my_bird.redraw(screen, images['bird'], images['bird2'])
+        gameBird.redraw(screen, gameImages['bird'], gameImages['bird2'])
 
         #Updating the screen
         pygame.display.update()
@@ -55,26 +43,26 @@ def main():
         #Checking if the user pressed left click or space and start (or not) the game
         for e in pygame.event.get():
             if e.type == pygame.MOUSEBUTTONDOWN or (e.type == pygame.KEYDOWN and e.key == K_SPACE):
-                my_bird.steps_to_jump = 15
-                wait = False
+                gameBird.steps_to_jump = 15
+                gameVariables.waitClick = False
     jump_sound.play()
     
     #Loop until...we die!
     while True:
         #Drawing the background
-        screen.blit(images['background'], (0, 0))
+        screen.blit(gameImages['background'], (0, 0))
 
         #Getting the mouse, keyboard or user events and act accordingly
         for e in pygame.event.get():
-            if e.type == EVENT_NEWPIPE:
-                p = PipePair(WIDTH, False)
-                pipes.append(p)
+            if e.type == getNewPipe:
+                p = PipePair(gameWidth, False)
+                gamePipes.append(p)
             elif e.type == pygame.MOUSEBUTTONDOWN:
-                my_bird.steps_to_jump = BIRD_JUMP_STEPS
+                gameBird.steps_to_jump = jumpSteps
                 jump_sound.play()
             elif e.type == pygame.KEYDOWN:
                 if e.key == K_SPACE:
-                    my_bird.steps_to_jump = BIRD_JUMP_STEPS
+                    gameBird.steps_to_jump = jumpSteps
                     jump_sound.play()
                 elif e.key == K_ESCAPE:
                     exit()
@@ -82,58 +70,60 @@ def main():
         #Tick! (new frame)
         clock.tick(FPS)
 
-        #Updating the position of the pipes and redrawing them; if a pipe is not visible anymore,
+        #Updating the position of the gamePipes and redrawing them; if a pipe is not visible anymore,
         #we remove it from the list
-        for p in pipes:
-            p.x -= FRAME_ANIMATION_WIDTH
-            if p.x <= - PIPE_WIDTH:
-                pipes.remove(p)
+        for p in gamePipes:
+            p.x -= pixelsFrame
+            if p.x <= - pipeWidth:
+                gamePipes.remove(p)
             else:
-                screen.blit(images['pipe-up'], (p.x, p.toph))
-                screen.blit(images['pipe-down'], (p.x, p.bottomh))
+                screen.blit(gameImages['pipe-up'], (p.x, p.toph))
+                screen.blit(gameImages['pipe-down'], (p.x, p.bottomh))
 
         #Redrawing the ground
-        my_ground.move_and_redraw(screen)
+        gameGround.move_and_redraw(screen)
         
         #Updating the bird position and redrawing it
-        my_bird.update_position()
-        my_bird.redraw(screen, images['bird'], images['bird2'])
+        gameBird.update_position()
+        gameBird.redraw(screen, gameImages['bird'], gameImages['bird2'])
 
-        #Checks for any collisions between the pipes, bird and/or the lower and the
+        #Checks for any collisions between the gamePipes, bird and/or the lower and the
         #upper part of the screen
-        if any(p.check_collision((my_bird.bird_x, my_bird.bird_y)) for p in pipes) or my_bird.bird_y < 0 or my_bird.bird_y + BIRD_HEIGHT > HEIGHT - GROUND_HEIGHT:
+        if any(p.check_collision((gameBird.bird_x, gameBird.bird_y)) for p in gamePipes) or \
+               gameBird.bird_y < 0 or \
+               gameBird.bird_y + birdHeight > gameHeight - groundHeight:
             dead_sound.play()
             break
 
         #There were no collision if we ended up here, so we are checking to see if 
-        #the bird went thourgh one half of the pipe's width; if so, we update the score
-        for p in pipes:
-            if(my_bird.bird_x > p.x and not p.score_counted):
+        #the bird went thourgh one half of the pipe's gameWidth; if so, we update the gameScore
+        for p in gamePipes:
+            if(gameBird.bird_x > p.x and not p.score_counted):
                 p.score_counted = True
-                score += 1
+                gameVariables.gameScore += 1
                 score_sound.play()
 
-        #Draws the score on the screen
-        draw_text(screen, score, 50, 35)
+        #Draws the gameScore on the screen
+        draw_text(screen, gameVariables.gameScore, 50, 35)
         
         #Updates the screen
         pygame.display.update()
 
     #We are dead now, so we make the bird "fall"
-    while(my_bird.bird_y + BIRD_HEIGHT < HEIGHT - GROUND_HEIGHT):
+    while(gameBird.bird_y + birdHeight < gameHeight - groundHeight):
         #Redraws the background
-        screen.blit(images['background'], (0, 0))
+        screen.blit(gameImages['background'], (0, 0))
 
-        #Redrawing the pipes in the same place as when it died
-        for p in pipes:
-            screen.blit(images['pipe-up'], (p.x, p.toph))
-            screen.blit(images['pipe-down'], (p.x, p.bottomh))
+        #Redrawing the gamePipes in the same place as when it died
+        for p in gamePipes:
+            screen.blit(gameImages['pipe-up'], (p.x, p.toph))
+            screen.blit(gameImages['pipe-down'], (p.x, p.bottomh))
 
         #Draws the ground piece to get the rolling effect
-        my_ground.move_and_redraw(screen)
+        gameGround.move_and_redraw(screen)
 
         #Makes the bird fall down and rotates it
-        my_bird.redraw_dead(screen, images['bird'])
+        gameBird.redraw_dead(screen, gameImages['bird'])
 
         #Tick!
         clock.tick(FPS * 3)
@@ -142,7 +132,7 @@ def main():
         pygame.display.update()
 
     #Let's end the game!
-    if not end_the_game(screen, score):
+    if not end_the_game(screen, gameScore):
         main()
     else:
         pygame.display.quit()

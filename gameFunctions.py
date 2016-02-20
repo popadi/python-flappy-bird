@@ -2,6 +2,18 @@
 import sys, os, random, pygame
 from gameVariables import *
 
+def initialize_pygame():
+    pygame.init()
+    pygame.mixer.init()
+
+    #Opening the window in the center of the screen
+    os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((screenResolution.current_w - gameWidth) / 2, (screenResolution.current_h - gameHeight) / 2)
+    screen = pygame.display.set_mode([gameWidth, gameHeight], pygame.DOUBLEBUF, 32)
+    pygame.display.set_icon(pygame.image.load('images/icon.ico'))
+    pygame.display.set_caption("Flappy Bird")
+
+    return screen
+
 def load_images():
     #- Loading all the images required for the game from the images folder
     #and returning a dictionary of them as following:
@@ -34,26 +46,26 @@ def load_images():
 
 def draw_text(screen, text, y_pos, size):
     #Drawing a black text (bigger) and then a white text, smaller
-    #over it to get the desired score effect
+    #over it to get the desired gameScore effect
     font = pygame.font.Font("data/04b_19.TTF", size)
     score_text_b = font.render(str(text), 1, (0, 0, 0))
     score_text_w = font.render(str(text), 1, (255, 255, 255))
 
-    x_pos_b = (WIDTH - score_text_b.get_width()) / 2
-    x_pos_w = (WIDTH - score_text_w.get_width()) / 2
+    x_pos_b = (gameWidth - score_text_b.get_width()) / 2
+    x_pos_w = (gameWidth - score_text_w.get_width()) / 2
     screen.blit(score_text_b, (x_pos_b + 2, y_pos - 1))
     screen.blit(score_text_w, (x_pos_w, y_pos))
 
-def end_the_game(screen, score):
-    #Draws a rectangle & shows the score & updates the highscore
-    pygame.draw.rect(screen, (0, 0, 0), (23, HEIGHT / 2 - 77, 254, 154))
-    pygame.draw.rect(screen, (239, 228, 150), (25, HEIGHT / 2 - 75, 250, 150))
-    draw_text(screen, "Your score: " + str(score), 200, 35)
+def end_the_game(screen, gameScore):
+    #Draws a rectangle & shows the gameScore & updates the highscore
+    pygame.draw.rect(screen, (0, 0, 0), (23, gameHeight / 2 - 77, 254, 154))
+    pygame.draw.rect(screen, (239, 228, 150), (25, gameHeight / 2 - 75, 250, 150))
+    draw_text(screen, "Your Score: " + str(gameScore), 200, 35)
     
     f = open("data/highscore", "r+")
     hs = int(f.readline())
-    if(score > hs):
-       hs = score
+    if(gameScore > hs):
+       hs = gameScore
        f.seek(0)
        f.truncate()
        f.write(str(hs))
