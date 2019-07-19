@@ -26,5 +26,7 @@ pygame.init()                                #Initialize pygame
 screenResolution = pygame.display.Info()     #Get screen resolution
 pygame.quit()                                #Close pygame
 
-gameScore = 0                                #Game gameScore
+gameScore = 0       
+highscore = 0                         #Game gameScore
 waitClick = True                         
+
