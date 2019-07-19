@@ -7,6 +7,8 @@ from gameFunctions import *
 from gameClasses import *
 import gameVariables
 
+
+    
 def main():
     #Initializing pygame & mixer
     screen = initialize_pygame()
@@ -21,11 +23,14 @@ def main():
     gameImages = load_images()
     gameVariables.gameScore = 0
     gameGround = Ground(gameImages['ground'])
-      
+       
     #Loading the sounds
     jump_sound = pygame.mixer.Sound('sounds/jump.ogg')
     score_sound = pygame.mixer.Sound('sounds/score.ogg')
     dead_sound = pygame.mixer.Sound('sounds/dead.ogg')
+    running = True
+
+
 
     while(gameVariables.waitClick == True):
         #Draw everything and waitClick for the user to click to start the game
@@ -45,6 +50,12 @@ def main():
             if e.type == pygame.MOUSEBUTTONDOWN or (e.type == pygame.KEYDOWN and e.key == K_SPACE):
                 gameBird.steps_to_jump = 15
                 gameVariables.waitClick = False
+
+            elif e.type == pygame.QUIT:
+                pygame.display.quit()
+                pygame.quit()
+                sys.exit()
+
     jump_sound.play()
     
     #Loop until...we die!
@@ -60,6 +71,10 @@ def main():
             elif e.type == pygame.MOUSEBUTTONDOWN:
                 gameBird.steps_to_jump = jumpSteps
                 jump_sound.play()
+            elif e.type == pygame.QUIT:
+                pygame.display.quit()
+                pygame.quit()
+                sys.exit()
             elif e.type == pygame.KEYDOWN:
                 if e.key == K_SPACE:
                     gameBird.steps_to_jump = jumpSteps
@@ -130,16 +145,29 @@ def main():
     
         #Updates the entire screen
         pygame.display.update()
+        
+    gameVariables.highscore = get_high_score()
+    #print(gameVariables.gameScore)
+    #print(gameVariables.highscore)
+    if gameVariables.gameScore >= gameVariables.highscore:
+        #print("saving highscore")
+        save_high_score(gameVariables.gameScore)
+        gameVariables.highscore = gameVariables.gameScore
+
 
     #Let's end the game!
-    if not end_the_game(screen, gameScore):
+    if not end_the_game(screen, gameVariables.gameScore,gameVariables.highscore):
         main()
     else:
         pygame.display.quit()
         pygame.quit()
         sys.exit()
 
+
+    
+
 if __name__ == '__main__':
     #- If this module had been imported, __name__ would be 'Flappy Bird';
     #otherwise, if it was executed (by double-clicking the file) we would call main
     main()
+

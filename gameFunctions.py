@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, random, pygame
+import sys, os, random, pygame,pickle
 from gameVariables import *
 
 def initialize_pygame():
@@ -56,22 +56,19 @@ def draw_text(screen, text, y_pos, size):
     screen.blit(score_text_b, (x_pos_b + 2, y_pos - 1))
     screen.blit(score_text_w, (x_pos_w, y_pos))
 
-def end_the_game(screen, gameScore):
+def end_the_game(screen, gameScore,high_score):
     #Draws a rectangle & shows the gameScore & updates the highscore
+    
+    
     pygame.draw.rect(screen, (0, 0, 0), (23, gameHeight / 2 - 77, 254, 154))
     pygame.draw.rect(screen, (239, 228, 150), (25, gameHeight / 2 - 75, 250, 150))
+   
+
     draw_text(screen, "Your Score: " + str(gameScore), 200, 35)
     
-    f = open("data/highscore", "r+")
-    hs = int(f.readline())
-    if(gameScore > hs):
-       hs = gameScore
-       f.seek(0)
-       f.truncate()
-       f.write(str(hs))
-    f.close()
+
     
-    draw_text(screen, "Highscore: " + str(hs), 250, 35)
+    draw_text(screen, "Highscore: " + str(high_score), 250, 35)
     draw_text(screen, "Press space to restart", 335, 20)
     draw_text(screen, "Press esc to exit", 355, 20)
     
@@ -86,3 +83,33 @@ def end_the_game(screen, gameScore):
                     return 0
                 elif e.key == K_ESCAPE:
                     return 1
+                
+
+
+def get_high_score():
+    high_score = 0
+    high_score_file = open("highscore","r+")
+    try:
+        high_score = int(high_score_file.read())
+    except IOError:
+        print("There is no highscore yet")
+    except ValueError:
+        print("Can't understand")
+    finally :
+        high_score_file.close()
+        return(high_score)
+
+
+    
+
+def save_high_score(new_high_score):
+    high_score_file = open("highscore","w")
+    print(new_high_score)
+    try:
+        high_score_file.write(str(new_high_score))
+       
+    except IOError:
+        print("Unable to save the highscore")
+
+    finally :
+        high_score_file.close()
